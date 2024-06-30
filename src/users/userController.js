@@ -1,7 +1,9 @@
 const createError = require("http-errors");
+const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userModel = require("./userModel");
+const questionModel = require("../questions/questionModel");
 const { generateAccessToken, generateRefreshToken } = require("../utils/auth");
 const config = require("../config/config");
 const UserProgress = require("../userProgress/userProgressModel");
@@ -252,36 +254,68 @@ const handleUserDelete = async (req, res, next) => {
   }
 };
 
-const checkSolvedQuiz = async (req, res, next) => {
-  const userId = req.params.userId;
-  const quizId = req.params.quizId;
+const getUserSolvedQuizes = async (req, res, next) => {
+  const userId = req.params.id;
 
   try {
+    // Find the user by ID to get the solved quizzes IDs
     const user = await userModel.findById(userId);
 
     if (!user) {
-      return next(createError(404, "User not found."));
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const isQuizSolved = user.solvedQuizzes.includes(quizId);
+    // Retrieve the IDs of solved quizzes from the User model
+    const solvedQuizIds = user.solvedQuizzes;
+
+    // Query the Question model to fetch details of solved quizzes
+    const solvedQuizzes = await Promise.all(
+      solvedQuizIds.map(async (quizId) => {
+        try {
+          // Find the question by its _id using findById
+          const question = await questionModel.findOne({ "quiz._id": quizId });
+
+          if (!question) {
+            return null; // Handle case where question is not found
+          }
+
+          // Find the specific quiz object within the question's quiz array
+          const quiz = question.quiz.find((q) => q._id.equals(quizId));
+
+          if (!quiz) {
+            return null; // Handle case where quiz is not found within the question
+          }
+
+          // Format the quiz data as needed
+          return {
+            questionId: question._id,
+            title: question.title,
+            quiz: {
+              _id: quiz._id,
+              question_text: quiz.question_text,
+              answer: quiz.answer,
+              hint: quiz.hint,
+            },
+          };
+        } catch (error) {
+          console.error("Error fetching quiz:", error.message);
+          return null; // Handle error fetching quiz
+        }
+      })
+    );
+
+    // Filter out any null values (if quiz not found)
+    const filteredQuizzes = solvedQuizzes.filter((quiz) => quiz !== null);
 
     res.status(200).json({
-      StatusCode: 200,
-      IsSuccess: true,
-      ErrorMessage: [],
-      Result: {
-        message: isQuizSolved
-          ? "Quiz has been solved by the user."
-          : "Quiz has not been solved by the user.",
-        solved: isQuizSolved,
-      },
+      message: "Solved quizzes fetched successfully",
+      solved_quizzes: filteredQuizzes,
     });
   } catch (error) {
-    console.error("Error checking solved quiz:", error);
-    next(createError(500, `Server Error: ${error.message}`));
+    console.error("Error fetching solved quizzes:", error.message);
+    res.status(500).json({ message: `Server error: ${error.message}` });
   }
 };
-
 
 module.exports = {
   registerUser,
@@ -291,5 +325,5 @@ module.exports = {
   getUserById,
   handleUserDelete,
   refreshAccessToken,
-  checkSolvedQuiz,
+  getUserSolvedQuizes,
 };

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+
+
 const userModelSchema = new mongoose.Schema(
   {
     fullname: {
@@ -28,7 +30,10 @@ const userModelSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    solvedQuizzes: [],
+    solvedQuizzes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Question",
+    }],
     rewards: {
       type: Number,
       default: 0,

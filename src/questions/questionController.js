@@ -83,7 +83,6 @@ const updateQuestionSet = async (req, res, next) => {
 
   if (!title || !questions) {
     const errorMessage = "Title and questions are required.";
-    console.error(errorMessage);
     return res.status(400).json({
       StatusCode: 400,
       IsSuccess: false,
@@ -95,7 +94,6 @@ const updateQuestionSet = async (req, res, next) => {
   const questionExists = await questionModel.findById(id);
   if (!questionExists) {
     const errorMessage = "Question not found.";
-    console.error(errorMessage);
     return res.status(404).json({
       StatusCode: 404,
       IsSuccess: false,
