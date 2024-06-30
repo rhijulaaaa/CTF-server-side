@@ -250,6 +250,35 @@ const handleUserDelete = async (req, res, next) => {
   }
 };
 
+const checkSolvedQuiz = async (req, res, next) => {
+  const userId = req.params.userId;
+  const quizId = req.params.quizId;
+
+  try {
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return next(createError(404, "User not found."));
+    }
+
+    const isQuizSolved = user.solvedQuizzes.includes(quizId);
+
+    res.status(200).json({
+      StatusCode: 200,
+      IsSuccess: true,
+      ErrorMessage: [],
+      Result: {
+        message: isQuizSolved
+          ? "Quiz has been solved by the user."
+          : "Quiz has not been solved by the user.",
+        solved: isQuizSolved,
+      },
+    });
+  } catch (error) {
+    console.error("Error checking solved quiz:", error);
+    next(createError(500, `Server Error: ${error.message}`));
+  }
+};
 
 module.exports = {
   registerUser,
@@ -259,4 +288,5 @@ module.exports = {
   getUserById,
   handleUserDelete,
   refreshAccessToken,
+  checkSolvedQuiz,
 };

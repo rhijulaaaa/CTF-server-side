@@ -14,7 +14,7 @@ const {
   getUserById,
   handleUserDelete,
   refreshAccessToken,
-  getUserProgress,
+  checkSolvedQuiz,
 } = require("./userController");
 const userRouter = express.Router();
 
@@ -25,5 +25,7 @@ userRouter.get("/getAllUsers", authenticateToken, isAdmin, getAllUsers);
 userRouter.get("/:id", authenticateToken, verifyUserId, isUser, getUserById);
 userRouter.post("/refresh", refreshAccessToken);
 userRouter.delete("/delete/:id", handleUserDelete);
+
+userRouter.get("/:userId/solvedQuiz/:quizId", checkSolvedQuiz);
 
 module.exports = userRouter;

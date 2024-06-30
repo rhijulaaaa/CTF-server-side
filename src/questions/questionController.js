@@ -161,7 +161,6 @@ const deleteSubQuestion = async (req, res, next) => {
 
   try {
     let question = await questionModel.findById(questionId);
-    console.log(question);
 
     if (!question) {
       return next(createError(404, "Question not found."));
@@ -187,7 +186,6 @@ const deleteSubQuestion = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error("Error deleting sub-question:", error);
     next(
       createError(
         500,
