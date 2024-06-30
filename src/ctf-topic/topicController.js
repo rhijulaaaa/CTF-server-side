@@ -42,6 +42,7 @@ const createTopic = async (req, res, next) => {
 const getTopic = async (req, res, next) => {
   try {
     const topics = await topicModel.find({});
+    console.log("topics from data base", topics);
     const message =
       topics.length >= 0
         ? "Successfully fetched all topics"

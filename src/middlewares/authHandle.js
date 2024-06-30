@@ -4,17 +4,19 @@ const userModel = require("../users/userModel");
 const config = require("../config/config");
 
 const authenticateToken = (req, res, next) => {
-  const { accessToken } = req.cookies;
+  console.log("req body", req.body);
+  const accessToken = req.body;
   if (!accessToken) {
     return next(createError(401, "Access Token not found"));
   }
 
   const authHeader = req.header("Authorization");
+  console.log(authHeader);
   if (!authHeader) {
     return next(createError(401, "Access Denied!"));
   }
 
-  const token = authHeader.split(" ")[1];
+  const token = accessToken.split(" ")[1];
   if (!token) {
     return next(createError(401, "Token is not valid"));
   }

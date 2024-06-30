@@ -70,12 +70,14 @@ const loginUser = async (req, res, next) => {
       return next(createError(404, "User not found!"));
     }
     const passMatch = await bcrypt.compare(password, user.password);
+    console.log("passMatch",passMatch);
     if (!passMatch) {
       return next(createError(401, "Incorrect email and password !"));
     }
-
+    console.log("user id", user._id);
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
+    console.log("refresh token heree", refreshToken);
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
