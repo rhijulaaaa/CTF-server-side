@@ -3,7 +3,7 @@ const createError = require("http-errors");
 const topicModel = require("./topicModel");
 
 const createTopic = async (req, res, next) => {
-  const { topic, description } = req.body;
+  const { topic, description, difficulty } = req.body;
   if (!topic || !description) {
     const error = createError(400, "Please, fill all the fields.");
     return next(error);
@@ -21,6 +21,7 @@ const createTopic = async (req, res, next) => {
     const newTopic = await topicModel.create({
       topic,
       description,
+      difficulty,
       createdBy,
     });
 
@@ -34,8 +35,12 @@ const createTopic = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error("Error while adding a new topic:", error);
-    next(createError(500, "Server error while adding a new topic"));
+    next(
+      createError(
+        500,
+        `Server error while adding a new topic. ${error.message}`
+      )
+    );
   }
 };
 
@@ -44,9 +49,9 @@ const getTopic = async (req, res, next) => {
     const topics = await topicModel.find({});
     console.log("topics from data base", topics);
     const message =
-      topics.length >= 0
-        ? "Successfully fetched all topics"
-        : "No topics were created";
+      topics.length <= 0
+        ? "No topics were created"
+        : "Successfully fetched all topics";
 
     res.status(200).json({
       StatusCode: 200,
@@ -58,16 +63,22 @@ const getTopic = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(createError(500, "Server error while fetching the topics"));
+    next(
+      createError(
+        500,
+        `Server error while fetching the topics. ${error.message}`
+      )
+    );
   }
 };
 
 const getSingleTopic = async (req, res, next) => {
   const { id } = req.params;
+  console.log(id);
   try {
     const topicDetails = await topicModel.findById(id);
-    if (topicDetails.length <= 0) {
-      return next(createError(404, "Topic details not found"));
+    if (!topicDetails) {
+      return next(createError(400, "Topic details not found"));
     }
     res.status(200).json({
       StatusCode: 200,
@@ -79,21 +90,23 @@ const getSingleTopic = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(createError(500, "Server error while getting the topic"));
+    next(
+      createError(500, `Server error while getting the topic. ${error.message}`)
+    );
   }
 };
 
 const updateTopic = async (req, res, next) => {
   const { id } = req.params;
-  const { topic, description } = req.body;
+  const { topic, description, difficulty } = req.body;
   const updatedBy = new mongoose.Types.ObjectId(req.user.sub);
   try {
     const updatedTopic = await topicModel.findByIdAndUpdate(
       id,
-      { topic, description, updatedBy},
+      { topic, description, difficulty, updatedBy },
       { new: true }
     );
-    if (updatedTopic.length <= 0) {
+    if (!updatedTopic) {
       return next(createError(404, "Topic details not found"));
     }
     res.status(200).json({
@@ -106,7 +119,12 @@ const updateTopic = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(createError(500, "Server error while updating the topic"));
+    next(
+      createError(
+        500,
+        `Server error while updating the topic. ${error.message}`
+      )
+    );
   }
 };
 
@@ -114,7 +132,7 @@ const deleteTopic = async (req, res, next) => {
   const { id } = req.params;
   try {
     const deletedTopic = await topicModel.findByIdAndDelete(id);
-    if (deletedTopic.length <= 0) {
+    if (!deletedTopic) {
       return next(createError(404, "Topic details not found"));
     }
     res.status(200).json({
@@ -127,7 +145,12 @@ const deleteTopic = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(createError(500, "Server error while deleting the topic"));
+    next(
+      createError(
+        500,
+        `Server error while deleting the topic. ${error.message}`
+      )
+    );
   }
 };
 
