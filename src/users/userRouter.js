@@ -15,6 +15,7 @@ const {
   handleUserDelete,
   refreshAccessToken,
   checkSolvedQuiz,
+  getUserSolvedQuizzes,
 } = require("./userController");
 const userRouter = express.Router();
 

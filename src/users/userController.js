@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const userModel = require("./userModel");
 const { generateAccessToken, generateRefreshToken } = require("../utils/auth");
 const config = require("../config/config");
+const UserProgress = require("../userProgress/userProgressModel");
+const Question = require("../questions/questionModel");
 
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -279,6 +281,7 @@ const checkSolvedQuiz = async (req, res, next) => {
     next(createError(500, `Server Error: ${error.message}`));
   }
 };
+
 
 module.exports = {
   registerUser,
