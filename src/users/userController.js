@@ -267,6 +267,7 @@ const getUserSolvedQuizes = async (req, res, next) => {
 
     // Retrieve the IDs of solved quizzes from the User model
     const solvedQuizIds = user.solvedQuizzes;
+    console.log(solvedQuizIds);
 
     // Query the Question model to fetch details of solved quizzes
     const solvedQuizzes = await Promise.all(
@@ -281,7 +282,7 @@ const getUserSolvedQuizes = async (req, res, next) => {
 
           // Find the specific quiz object within the question's quiz array
           const quiz = question.quiz.find((q) => q._id.equals(quizId));
-
+          console.log(quiz);
           if (!quiz) {
             return null; // Handle case where quiz is not found within the question
           }
