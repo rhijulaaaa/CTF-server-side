@@ -72,7 +72,12 @@ const getAllQuestion = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(createError(500, "Server Error while fetching all questions."));
+    next(
+      createError(
+        500,
+        `Server Error while fetching all questions.${error.message}`
+      )
+    );
   }
 };
 
