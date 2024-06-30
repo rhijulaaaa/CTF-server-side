@@ -304,12 +304,16 @@ const getUserSolvedQuizes = async (req, res, next) => {
     );
 
     const filteredQuizzes = solvedQuizzes.filter((quiz) => quiz !== null);
+    const message = filteredQuizzes.length
+      ? "Solved quizzes fetched successfully"
+      : "No solved quizzes found for this user";
+
     res.json({
       StatusCode: 200,
       IsSuccess: true,
       ErrorMessage: [],
       Result: {
-        message: "Solved quizzes fetched successfully",
+        message,
         solved_quizzes: filteredQuizzes,
       },
     });
