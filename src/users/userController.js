@@ -6,6 +6,8 @@ const userModel = require("./userModel");
 const questionModel = require("../questions/questionModel");
 const { generateAccessToken, generateRefreshToken } = require("../utils/auth");
 const config = require("../config/config");
+const UserProgress = require("../userProgress/userProgressModel");
+const Question = require("../questions/questionModel");
 
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -263,6 +265,7 @@ const getUserSolvedQuizes = async (req, res, next) => {
     }
 
     const solvedQuizIds = user.solvedQuizzes;
+    console.log(solvedQuizIds);
 
     const solvedQuizzes = await Promise.all(
       solvedQuizIds.map(async (quizId) => {
@@ -274,7 +277,7 @@ const getUserSolvedQuizes = async (req, res, next) => {
           }
 
           const quiz = question.quiz.find((q) => q._id.equals(quizId));
-
+          console.log(quiz);
           if (!quiz) {
             return next(createError(400, "Quiz Question not found."));
           }

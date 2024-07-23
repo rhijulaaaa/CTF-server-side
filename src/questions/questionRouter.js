@@ -8,7 +8,7 @@ const {
   updateQuestionSet,
   deleteSubQuestion,
   deleteQuestionSet,
-  getQuestionByTopic
+  getQuestionByTopic,
 } = require("./questionController");
 
 const questionRouter = express.Router();
